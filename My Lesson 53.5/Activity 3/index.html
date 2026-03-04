@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank App UI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #eef1f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 420px;
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #1f3a6b;
+            margin-bottom: 20px;
+        }
+
+        .balance-box {
+            background: linear-gradient(135deg, #1f3a6b, #2a4d8f);
+            color: white;
+            padding: 25px;
+            border-radius: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .balance-box h3 {
+            margin: 0;
+            font-size: 20px;
+            opacity: 0.9;
+        }
+
+        .balance-box p {
+            margin: 8px 0 0;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            background: #f9fafc;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #1f3a6b;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #16305a;
+        }
+
+        .transactions {
+            margin-top: 25px;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px;
+            border-radius: 10px;
+            background: #f7f9fc;
+            margin-bottom: 10px;
+        }
+
+        .income {
+            color: #0a8a0a;
+            font-weight: bold;
+        }
+
+        .expense {
+            color: #d11a2a;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Bank App</h2>
+
+    <div class="balance-box">
+        <h3>Current Balance</h3>
+        <p id="balance">$0.00</p>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="description" placeholder="Description">
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="amount" placeholder="Amount">
+    </div>
+
+    <div class="input-group">
+        <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+    </div>
+
+    <button onclick="addTransaction()">Add Transaction</button>
+
+    <div class="transactions" id="transactions"></div>
+</div>
+
+<script>
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    function saveData() {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+
+    function loadTransactions() {
+        let box = document.getElementById("transactions");
+        box.innerHTML = "";
+
+        let balance = 0;
+
+        transactions.forEach(t => {
+            let div = document.createElement("div");
+            div.className = "transaction";
+
+            div.innerHTML = `
+                <span>${t.desc}</span>
+                <span class="${t.type}">${t.type === "income" ? "+" : "-"}$${t.amount}</span>
+            `;
+
+            box.appendChild(div);
+
+            balance += t.type === "income" ? t.amount : -t.amount;
+        });
+
+        document.getElementById("balance").innerText = "$" + balance.toFixed(2);
+    }
+
+    function addTransaction() {
+        let desc = document.getElementById("description").value;
+        let amount = parseFloat(document.getElementById("amount").value);
+        let type = document.getElementById("type").value;
+
+        if (!desc || !amount) return;
+
+        transactions.push({ desc, amount, type });
+        saveData();
+        loadTransactions();
+
+        document.getElementById("description").value = "";
+        document.getElementById("amount").value = "";
+    }
+
+    loadTransactions();
+</script>
+
+</body>
+</html>

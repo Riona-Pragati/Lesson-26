@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank App UI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f4f7;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 400px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2a4d8f;
+        }
+        .balance-box {
+            background: #2a4d8f;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #2a4d8f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #1f3a6b;
+        }
+        .transactions {
+            margin-top: 20px;
+        }
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .income {
+            color: green;
+        }
+        .expense {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Bank App UI</h2>
+
+    <div class="balance-box">
+        <h3>Balance</h3>
+        <p id="balance">$0.00</p>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="description" placeholder="Description">
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="amount" placeholder="Amount">
+    </div>
+
+    <div class="input-group">
+        <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+    </div>
+
+    <button onclick="addTransaction()">Add Transaction</button>
+
+    <div class="transactions" id="transactions"></div>
+</div>
+
+<script>
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    function saveData() {
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+    }
+
+    function loadTransactions() {
+        let transactionBox = document.getElementById("transactions");
+        transactionBox.innerHTML = "";
+
+        let balance = 0;
+
+        transactions.forEach(t => {
+            let div = document.createElement("div");
+            div.className = "transaction";
+
+            div.innerHTML = `
+                <span>${t.desc}</span>
+                <span class="${t.type}">${t.type === "income" ? "+" : "-"}$${t.amount}</span>
+            `;
+
+            transactionBox.appendChild(div);
+
+            balance += t.type === "income" ? t.amount : -t.amount;
+        });
+
+        document.getElementById("balance").innerText = "$" + balance.toFixed(2);
+    }
+
+    function addTransaction() {
+        let desc = document.getElementById("description").value;
+        let amount = parseFloat(document.getElementById("amount").value);
+        let type = document.getElementById("type").value;
+
+        if (!desc || !amount) return;
+
+        transactions.push({ desc, amount, type });
+        saveData();
+        loadTransactions();
+
+        document.getElementById("description").value = "";
+        document.getElementById("amount").value = "";
+    }
+
+    loadTransactions();
+</script>
+
+</body>
+</html>
+
